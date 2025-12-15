@@ -21,6 +21,13 @@ export default function Employees() {
         status: "Active"
     };
 
+    const formatDate = (dateStr) => {
+        if (!dateStr) return 'Not Set';
+        const [year, month, day] = dateStr.split('-');
+        if (!year || !month || !day) return dateStr;
+        return `${day}/${month}/${year}`;
+    };
+
     // Initialize form data when selecting a new employee or entering edit mode
     useEffect(() => {
         if (selectedEmployee && !isCreating) {
@@ -272,7 +279,7 @@ export default function Employees() {
                                                 <div><label className="text-sm font-medium text-gray-500">Department</label><p className="text-gray-900 dark:text-white">{selectedEmployee.department}</p></div>
                                                 <div><label className="text-sm font-medium text-gray-500">Email</label><p className="text-gray-900 dark:text-white">{selectedEmployee.email}</p></div>
                                                 <div><label className="text-sm font-medium text-gray-500">Phone</label><p className="text-gray-900 dark:text-white">{selectedEmployee.phone}</p></div>
-                                                <div><label className="text-sm font-medium text-gray-500">DOB</label><p className="text-gray-900 dark:text-white">{selectedEmployee.dob}</p></div>
+                                                <div><label className="text-sm font-medium text-gray-500">DOB</label><p className="text-gray-900 dark:text-white">{formatDate(selectedEmployee.dob)}</p></div>
                                                 <div><label className="text-sm font-medium text-gray-500">Address</label><p className="text-gray-900 dark:text-white">{selectedEmployee.address}</p></div>
                                             </>
                                         )}
@@ -288,7 +295,7 @@ export default function Employees() {
                                                 {isEditing ? (
                                                     <input type="date" value={editFormData?.joiningDate} onChange={e => handleInputChange('joiningDate', e.target.value)} className="w-full rounded border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-1" />
                                                 ) : (
-                                                    <p className="font-bold text-lg text-gray-900 dark:text-white">{selectedEmployee.joiningDate || 'Not Set'}</p>
+                                                    <p className="font-bold text-lg text-gray-900 dark:text-white">{formatDate(selectedEmployee.joiningDate)}</p>
                                                 )}
                                             </div>
                                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
