@@ -1,2 +1,2 @@
 // Replace the email below with the specific email address allowed to access this app.
-export const ADMIN_EMAILS = ["abiram@digitalmojo.in", "srishti@digitalmojo.in", "info@digitalmojo.in"]; // Add more emails as needed
+export const ADMIN_EMAILS = ["abiram@digitalmojo.in", "srishti@digitalmojo.in", "lahari@digitalmojo.in"]; // Add more emails as needed
