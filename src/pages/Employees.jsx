@@ -21,6 +21,73 @@ export default function Employees() {
         status: "Active"
     };
 
+    const DateInput = ({ value, onChange, className }) => {
+        // value is always YYYY-MM-DD from parent state
+        // We maintain local display state for the text input
+        const [editValue, setEditValue] = useState('');
+
+        useEffect(() => {
+            if (value) {
+                const [y, m, d] = value.split('-');
+                if (y && m && d) {
+                    setEditValue(`${d}/${m}/${y}`);
+                }
+            } else {
+                setEditValue('');
+            }
+        }, [value]);
+
+        const handleTextChange = (e) => {
+            let val = e.target.value.replace(/[^0-9/]/g, '');
+
+            // Auto-slash logic
+            if (val.length === 2 && editValue.length === 1) val += '/';
+            if (val.length === 5 && editValue.length === 4) val += '/';
+            if (val.length > 10) val = val.slice(0, 10);
+
+            setEditValue(val);
+
+            // If valid complete date, update parent
+            if (val.length === 10) {
+                const [d, m, y] = val.split('/');
+                if (d && m && y && !isNaN(d) && !isNaN(m) && !isNaN(y)) {
+                    // Basic validation
+                    onChange(`${y}-${m}-${d}`);
+                }
+            }
+        };
+
+        const handleCalendarChange = (e) => {
+            onChange(e.target.value);
+        };
+
+        return (
+            <div className="relative">
+                <input
+                    type="text"
+                    value={editValue}
+                    onChange={handleTextChange}
+                    className={className}
+                    placeholder="DD/MM/YYYY"
+                    maxLength={10}
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+                    {/* Hidden Date Input Overlay on Icon */}
+                    <div className="relative">
+                        <span className="material-symbols-outlined text-gray-400 cursor-pointer pointer-events-none">calendar_today</span>
+                        <input
+                            type="date"
+                            value={value || ''}
+                            onChange={handleCalendarChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                            tabIndex={-1}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     const formatDate = (dateStr) => {
         if (!dateStr) return 'Not Set';
         const [year, month, day] = dateStr.split('-');
@@ -270,7 +337,7 @@ export default function Employees() {
                                                 </div>
                                                 <div><label className="text-sm font-medium text-gray-500">Email</label><input type="text" value={editFormData?.email} onChange={e => handleInputChange('email', e.target.value)} className="w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-1" /></div>
                                                 <div><label className="text-sm font-medium text-gray-500">Phone</label><input type="text" value={editFormData?.phone} onChange={e => handleInputChange('phone', e.target.value)} className="w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-1" /></div>
-                                                <div><label className="text-sm font-medium text-gray-500">DOB</label><input type="date" value={editFormData?.dob} onChange={e => handleInputChange('dob', e.target.value)} className="w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-1" /></div>
+                                                <div><label className="text-sm font-medium text-gray-500">DOB</label><DateInput value={editFormData?.dob} onChange={val => handleInputChange('dob', val)} className="w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-1" /></div>
                                                 <div><label className="text-sm font-medium text-gray-500">Address</label><input type="text" value={editFormData?.address} onChange={e => handleInputChange('address', e.target.value)} className="w-full rounded border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-1" /></div>
                                             </>
                                         ) : (
@@ -293,7 +360,7 @@ export default function Employees() {
                                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                                 <span className="text-sm text-gray-500">Date of Joining</span>
                                                 {isEditing ? (
-                                                    <input type="date" value={editFormData?.joiningDate} onChange={e => handleInputChange('joiningDate', e.target.value)} className="w-full rounded border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-1" />
+                                                    <DateInput value={editFormData?.joiningDate} onChange={val => handleInputChange('joiningDate', val)} className="w-full rounded border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-1" />
                                                 ) : (
                                                     <p className="font-bold text-lg text-gray-900 dark:text-white">{formatDate(selectedEmployee.joiningDate)}</p>
                                                 )}
