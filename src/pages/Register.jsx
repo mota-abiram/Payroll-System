@@ -2,40 +2,46 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-export default function Login() {
+export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
-    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
 
-    const { login, loginWithGoogle } = useAuth();
+    const { signup, loginWithGoogle } = useAuth();
     const navigate = useNavigate();
 
     const handleGoogleLogin = async () => {
         setError('');
-        setIsLoggingIn(true);
+        setIsRegistering(true);
         try {
             await loginWithGoogle();
             navigate('/');
         } catch (err) {
-            setError('Failed to login with Google.');
+            setError('Failed to register with Google.');
             console.error(err);
         }
-        setIsLoggingIn(false);
+        setIsRegistering(false);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (password !== confirmPassword) {
+            return setError('Passwords do not match');
+        }
+
         setError('');
-        setIsLoggingIn(true);
+        setIsRegistering(true);
         try {
-            await login(email, password);
+            await signup(email, password);
             navigate('/');
         } catch (err) {
-            setError('Failed to login. Please check your credentials.');
+            setError('Failed to create an account. ' + err.message);
             console.error(err);
         }
-        setIsLoggingIn(false);
+        setIsRegistering(false);
     };
 
     return (
@@ -43,10 +49,10 @@ export default function Login() {
             <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                        <span className="material-symbols-outlined text-3xl text-primary">lock</span>
+                        <span className="material-symbols-outlined text-3xl text-primary">person_add</span>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome Back</h2>
-                    <p className="text-gray-500 text-sm mt-1">Sign in to access the payroll dashboard</p>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Account</h2>
+                    <p className="text-gray-500 text-sm mt-1">Sign up to get started with payroll</p>
                 </div>
 
                 {error && (
@@ -78,26 +84,37 @@ export default function Login() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                        <input
+                            type="password"
+                            required
+                            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/50 outline-none transition-colors"
+                            placeholder="••••••••"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                    </div>
 
                     <button
                         type="submit"
-                        disabled={isLoggingIn}
+                        disabled={isRegistering}
                         className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        {isLoggingIn ? (
+                        {isRegistering ? (
                             <>
                                 <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                                Signing in...
+                                Creating Account...
                             </>
                         ) : (
-                            "Sign In"
+                            "Sign Up"
                         )}
                     </button>
 
                     <div className="text-center text-sm text-gray-500 mt-4">
-                        Don't have an account?{' '}
-                        <Link to="/register" className="text-primary hover:underline font-medium">
-                            Sign Up
+                        Already have an account?{' '}
+                        <Link to="/login" className="text-primary hover:underline font-medium">
+                            Sign In
                         </Link>
                     </div>
 
@@ -113,7 +130,7 @@ export default function Login() {
                     <button
                         type="button"
                         onClick={handleGoogleLogin}
-                        disabled={isLoggingIn}
+                        disabled={isRegistering}
                         className="w-full py-3 px-4 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm flex items-center justify-center gap-2"
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -134,7 +151,7 @@ export default function Login() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        Sign in with Google
+                        Sign up with Google
                     </button>
                 </form>
             </div>
